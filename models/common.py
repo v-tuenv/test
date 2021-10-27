@@ -660,3 +660,6 @@ class Mixup(torch.nn.Module):
         mixed_data = self.lam * inputs + (1 - self.lam) * inputs[self.index,:]
 
         return mixed_data
+
+
+
