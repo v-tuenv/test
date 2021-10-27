@@ -272,7 +272,7 @@ class TitaNet(nn.Module):
         epilog_kernel_size=1,
         attention_hidden_size=128,
         se_reduction=16,
-        simple_pool='MHAP',
+        simple_pool='ASP',
         dropout=0.5,
         device="cpu",
     ):
@@ -355,7 +355,7 @@ class TitaNet(nn.Module):
         n_mega_blocks=None,
         model_size="s",
         attention_hidden_size=128,
-        simple_pool=False,
+        simple_pool="ASP",
         dropout=0.5,
         device="cpu",
     ):
