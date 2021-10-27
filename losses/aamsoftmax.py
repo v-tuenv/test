@@ -27,7 +27,7 @@ class AAMSoftmax(nn.Module):
 
     def forward(self, x, label=None):
         assert len(x.shape) == 3
-        label = label.repeat_interleave(x.shape[1])
+        # label = label.repeat_interleave(x.shape[1])
         x = x.reshape(-1, self.in_feats)
         assert x.size()[0] == label.size()[0]
         assert x.size()[1] == self.in_feats
