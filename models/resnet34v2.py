@@ -7,7 +7,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torch.nn import Parameter
 from models.resnet_block import *
-
+from models.pooling import MultiHeadAttentionPooling
 
 class ResNetSE34(nn.Module):
     def __init__(self, block, layers, num_filters, nOut, encoder_type='SAP', n_mels=40, log_input=True, **kwargs):
@@ -33,19 +33,23 @@ class ResNetSE34(nn.Module):
 
 
         outmap_size = int(self.n_mels/8)
-
-        self.attention = nn.Sequential(
-            nn.Conv1d(num_filters[3] * outmap_size, 128, kernel_size=1),
-            nn.ReLU(),
-            nn.BatchNorm1d(128),
-            nn.Conv1d(128, num_filters[3] * outmap_size, kernel_size=1),
-            nn.Softmax(dim=2),
+        if encoder_type == 'MHAT':
+            self.attention = MultiHeadAttentionPooling(num_filters[3] * outmap_size)
+        else:
+            self.attention = nn.Sequential(
+                nn.Conv1d(num_filters[3] * outmap_size, 128, kernel_size=1),
+                nn.ReLU(),
+                nn.BatchNorm1d(128),
+                nn.Conv1d(128, num_filters[3] * outmap_size, kernel_size=1),
+                nn.Softmax(dim=2),
             )
 
         if self.encoder_type == "SAP":
             out_dim = num_filters[3] * outmap_size
         elif self.encoder_type == "ASP":
             out_dim = num_filters[3] * outmap_size * 2
+        elif self.encoder_type == 'MHAT':
+            out_dim  = num_filters[3] * outmap_size * 2
         else:
             raise ValueError('Undefined encoder')
 
@@ -93,7 +97,7 @@ class ResNetSE34(nn.Module):
         x = self.layer4(x)
 
         x = x.reshape(x.size()[0],-1,x.size()[-1])
-
+        # print(x.size())
         w = self.attention(x)
 
         if self.encoder_type == "SAP":
@@ -102,7 +106,8 @@ class ResNetSE34(nn.Module):
             mu = torch.sum(x * w, dim=2)
             sg = torch.sqrt( ( torch.sum((x**2) * w, dim=2) - mu**2 ).clamp(min=1e-5) )
             x = torch.cat((mu,sg),1)
-
+        elif self.encoder_type == 'MHAT':
+            x = w.squeeze(-1)
         x = x.view(x.size()[0], -1)
         x = self.fc(x)
 
