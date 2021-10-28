@@ -139,7 +139,7 @@ class MarginSoftmaxLoss(TopVirtualLoss):
                 Applied Sciences, 10(1), 60. 
     """
     def init(self, input_dim, num_targets, 
-             m=0.3, s=30., t=1.,
+             m=0.2, s=30., t=1.,
              feature_normalize=True,
              method="sm3",
              double=False,

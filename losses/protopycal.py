@@ -41,10 +41,10 @@ class softmaxprototypical(nn.Module):
         super(softmaxprototypical, self).__init__()
 
         self.test_normalize = True
-        dtype = kwargs.get("final_layer","AAM")
+        dtype = kwargs.get("final_layer","MarginSoftmaxLoss")
         if dtype == 'AAM':
             self.softmax = AAMSoftmax( 
-                embedding_dim = kwargs.get("embedding_dim"), num_classes=kwargs.get("num_classes"), margin=0.3, scale=30.,
+                embedding_dim = kwargs.get("embedding_dim"), num_classes=kwargs.get("num_classes"), margin=0.2, scale=30.,
             )
         else:
             self.softmax = MarginSoftmaxLoss(
@@ -53,6 +53,7 @@ class softmaxprototypical(nn.Module):
                 ring_loss=0.2,
                 inter_loss=0.1
             )
+            print("Init marginLoss ")
         self.angleproto = angleproto(**kwargs)
 
         print('Initialised SoftmaxPrototypical Loss')
