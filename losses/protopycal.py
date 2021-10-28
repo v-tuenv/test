@@ -66,4 +66,4 @@ class softmaxprototypical(nn.Module):
 
         nlossP, _       = self.angleproto(x,None)
 
-        return nlossS+nlossP, prec1
+        return nlossS+nlossP * 0.5, prec1
