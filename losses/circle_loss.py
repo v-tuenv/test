@@ -6,7 +6,7 @@ from torch.nn import functional as F
 
 
 class CircleLoss(nn.Module):
-    def __init__(self, margin = 0.2, gamma = 128.):
+    def __init__(self, margin = 0.2, gamma = 128.,**kwargs):
         super().__init__()
         self.m = margin 
         self.gamma = gamma

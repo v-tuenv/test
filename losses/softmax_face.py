@@ -138,16 +138,17 @@ class MarginSoftmaxLoss(TopVirtualLoss):
             [7] Zhou, S., Chen, C., Han, G., & Hou, X. (2020). Double Additive Margin Softmax Loss for Face Recognition. 
                 Applied Sciences, 10(1), 60. 
     """
+    # cos(u,v) = u*V^T / ||u|| ||v||
     def init(self, input_dim, num_targets, 
-             m=0.2, s=30., t=1.,
-             feature_normalize=True,
-             method="sm3",
-             double=False,
-             mhe_loss=False, mhe_w=0.01,
-             inter_loss=0.,
-             ring_loss=0.,
-             curricular=False,
-             reduction='mean', eps=1.0e-10, init=True):
+              m=0.2, s=30., t=1.,
+              feature_normalize=True,
+              method="sm3",
+              double=False,
+              mhe_loss=False, mhe_w=0.01,
+              inter_loss=0.,
+              ring_loss=0.,
+              curricular=False,
+              reduction='mean', eps=1.0e-10, init=True):
 
         self.input_dim = input_dim
         self.num_targets = num_targets
@@ -260,7 +261,7 @@ class MarginSoftmaxLoss(TopVirtualLoss):
         # it is a lie about why we can not decrease the loss to a mininum value. We should not report the 
         # loss after margin penalty did but we really report this invalid loss to avoid computing the 
         # training loss twice.
-        prec1   = accuracy(outputs.detach(), targets.detach(), topk=(1,))[0]
+        prec1   = accuracy(self.get_posterior(), targets.detach(), topk=(1,))[0]
         if self.ring_loss > 0:
             ring_loss = torch.mean((self.s - self.r)**2)/2
         else:
