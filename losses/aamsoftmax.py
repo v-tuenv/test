@@ -3,16 +3,28 @@ import torch.nn as nn
 import torch.nn.functional as F
 import time, pdb, numpy, math
 from metrics_module.accuracy import accuracy
+class SigmoidLoss(torch.nn.Module):
+    def __init__(self):
+        super().__init__()
+    def forward(self, inputs, targets):
+        targets = F.one_hot(targets, num_classes=inputs.size(1)).float()
+        
 
+        return  torch.nn.BCEWithLogitsLoss()(
+            inputs, targets
+        )
 class AAMSoftmax(nn.Module):
-    def __init__(self, embedding_dim, num_classes, margin=0.3, scale=15, easy_margin=False, **kwargs):
+    def __init__(self, embedding_dim, num_classes, margin=0.3, scale=15, easy_margin=False, use_sigmoid=True, **kwargs):
         super(AAMSoftmax, self).__init__()
 
         self.m = margin
         self.s = scale
         self.in_feats = embedding_dim
         self.weight = torch.nn.Parameter(torch.FloatTensor(num_classes, embedding_dim), requires_grad=True)
-        self.ce = nn.CrossEntropyLoss()
+        if use_sigmoid is False:
+            self.ce = nn.CrossEntropyLoss()
+        else:
+            self.ce = SigmoidLoss()
         nn.init.xavier_normal_(self.weight, gain=1)
 
         self.easy_margin = easy_margin
