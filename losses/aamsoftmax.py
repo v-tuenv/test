@@ -25,6 +25,7 @@ class AAMSoftmax(nn.Module):
             self.ce = nn.CrossEntropyLoss()
         else:
             self.ce = SigmoidLoss()
+            
         nn.init.xavier_normal_(self.weight, gain=1)
 
         self.easy_margin = easy_margin
