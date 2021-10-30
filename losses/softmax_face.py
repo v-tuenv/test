@@ -113,6 +113,17 @@ class SoftmaxLoss(TopVirtualLoss):
 
 
 
+class SigmoidLoss(torch.nn.Module):
+    def __init__(self):
+        super().__init__()
+    def forward(self, inputs, targets):
+        targets = F.one_hot(targets, num_classes=inputs.size(1)).float()
+
+
+        return  torch.nn.BCEWithLogitsLoss()(
+            inputs, targets
+        )
+
 
 
 class MarginSoftmaxLoss(TopVirtualLoss):
@@ -148,7 +159,7 @@ class MarginSoftmaxLoss(TopVirtualLoss):
               inter_loss=0.,
               ring_loss=0.,
               curricular=False,
-              reduction='mean', eps=1.0e-10, init=True):
+              reduction='mean', eps=1.0e-10, init=True, loss_funtion_sigmoid=True):
 
         self.input_dim = input_dim
         self.num_targets = num_targets
@@ -182,9 +193,10 @@ class MarginSoftmaxLoss(TopVirtualLoss):
                 print("Warning : using feature noamlization with small scalar s={s} could result in bad convergence. \
                 There are some suggested s : {suggested_s} w.r.t p_target {p_target}.".format(
                 s=self.s, suggested_s=suggested_s, p_target=p_target))
-
-        self.loss_function = torch.nn.CrossEntropyLoss(reduction=reduction)
-
+        if loss_funtion_sigmoid is False:
+            self.loss_function = torch.nn.CrossEntropyLoss(reduction=reduction)
+        else:
+            self.loss_function  = SigmoidLoss()
         # Init weight.
         if init:
              # torch.nn.init.xavier_normal_(self.weight, gain=1.0)
@@ -206,9 +218,9 @@ class MarginSoftmaxLoss(TopVirtualLoss):
         if not self.feature_normalize :
             self.s = inputs.norm(2, dim=1) # [batch-size, l2-norm]
             # The accuracy must be reported before margin penalty added
-            self.posterior = (self.s.detach() * cosine_theta.detach()).unsqueeze(2) 
+            self.posterior = (self.s.detach() * cosine_theta.detach()) 
         else:
-            self.posterior = (self.s * cosine_theta.detach()).unsqueeze(2)
+            self.posterior = (self.s * cosine_theta.detach())
 
         if not self.training:
             # For valid set.
