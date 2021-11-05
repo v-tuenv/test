@@ -118,7 +118,7 @@ class SigmoidLoss(torch.nn.Module):
         super().__init__()
     def forward(self, inputs, targets):
         targets = F.one_hot(targets, num_classes=inputs.size(1)).float()
-
+        
 
         return  torch.nn.BCEWithLogitsLoss()(
             inputs, targets

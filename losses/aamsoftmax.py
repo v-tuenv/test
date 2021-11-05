@@ -3,6 +3,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 import time, pdb, numpy, math
 from metrics_module.accuracy import accuracy
+# Cross Entropyloss
 class SigmoidLoss(torch.nn.Module):
     def __init__(self):
         super().__init__()
