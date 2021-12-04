@@ -102,8 +102,9 @@ class ResNetSE34(nn.Module):
         x = x * w
         # x = x.view(x.size()[0], -1)
         x = x.transpose(1,2)
-        s = x.size()
-        x = x.view(s[0] * s[1],-1)
+        bs = x.size(0)
+        a = x.size(1)
+        x = x.view(bs *a,-1)
         x = self.fc(x)
         # if self.encoder_type == "SAP":
         #     x = torch.sum(x * w, dim=2)
@@ -116,7 +117,7 @@ class ResNetSE34(nn.Module):
         # x = x.view(x.size()[0], -1)
         # x = self.fc(x)
 
-        return x.view(s[0],-1) #(bs, time_step, 256) 
+        return x.view(bs,-1) #(bs, time_step, 256) 
 
 
 
