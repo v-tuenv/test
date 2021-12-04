@@ -10,7 +10,7 @@ from models.resnet_block import *
 from models.pooling import MultiHeadAttentionPooling
 
 class ResNetSE34(nn.Module):
-    def __init__(self, block, layers, num_filters, nOut, encoder_type='SAP', n_mels=40, log_input=True, **kwargs):
+    def __init__(self, block, layers, num_filters, nOut, encoder_type='ASP', n_mels=40, log_input=True, **kwargs):
         super(ResNetSE34, self).__init__()
 
         print('Embedding size is %d, encoder %s.'%(nOut, encoder_type))
@@ -100,16 +100,16 @@ class ResNetSE34(nn.Module):
         # print(x.size())
         w = self.attention(x)
 
-        if self.encoder_type == "SAP":
-            x = torch.sum(x * w, dim=2)
-        elif self.encoder_type == "ASP":
-            mu = torch.sum(x * w, dim=2)
-            sg = torch.sqrt( ( torch.sum((x**2) * w, dim=2) - mu**2 ).clamp(min=1e-5) )
-            x = torch.cat((mu,sg),1)
-        elif self.encoder_type == 'MHAT':
-            x = w.squeeze(-1)
-        x = x.view(x.size()[0], -1)
-        x = self.fc(x)
+        # if self.encoder_type == "SAP":
+        #     x = torch.sum(x * w, dim=2)
+        # elif self.encoder_type == "ASP":
+        #     mu = torch.sum(x * w, dim=2)
+        #     sg = torch.sqrt( ( torch.sum((x**2) * w, dim=2) - mu**2 ).clamp(min=1e-5) )
+        #     x = torch.cat((mu,sg),1)
+        # elif self.encoder_type == 'MHAT':
+        #     x = w.squeeze(-1)
+        # x = x.view(x.size()[0], -1)
+        # x = self.fc(x)
 
         return x
 
