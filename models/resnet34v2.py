@@ -99,25 +99,25 @@ class ResNetSE34(nn.Module):
         x = x.reshape(x.size()[0],-1,x.size()[-1])
         # print(x.size())
         w = self.attention(x)
-        x = x * w
-        # x = x.view(x.size()[0], -1)
-        x = x.transpose(1,2)
-        bs = x.size(0)
-        a = x.size(1)
-        x = x.reshape(bs *a,-1)
-        x = self.fc(x)
-        # if self.encoder_type == "SAP":
-        #     x = torch.sum(x * w, dim=2)
-        # elif self.encoder_type == "ASP":
-        #     mu = torch.sum(x * w, dim=2)
-        #     sg = torch.sqrt( ( torch.sum((x**2) * w, dim=2) - mu**2 ).clamp(min=1e-5) )
-        #     x = torch.cat((mu,sg),1)
-        # elif self.encoder_type == 'MHAT':
-        #     x = w.squeeze(-1)
-        # x = x.view(x.size()[0], -1)
+        # x = x * w
+        # # x = x.view(x.size()[0], -1)
+        # x = x.transpose(1,2)
+        # bs = x.size(0)
+        # a = x.size(1)
+        # x = x.reshape(bs *a,-1)
         # x = self.fc(x)
+        if self.encoder_type == "SAP":
+            x = torch.sum(x * w, dim=2)
+        elif self.encoder_type == "ASP":
+            mu = torch.sum(x * w, dim=2)
+            sg = torch.sqrt( ( torch.sum((x**2) * w, dim=2) - mu**2 ).clamp(min=1e-5) )
+            x = torch.cat((mu,sg),1)
+        elif self.encoder_type == 'MHAT':
+            x = w.squeeze(-1)
+        x = x.view(x.size()[0], -1)
+        x = self.fc(x)
 
-        return x.view(bs,-1) #(bs, time_step, 256) 
+        return x
 
 
 
