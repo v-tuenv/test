@@ -99,7 +99,12 @@ class ResNetSE34(nn.Module):
         x = x.reshape(x.size()[0],-1,x.size()[-1])
         # print(x.size())
         w = self.attention(x)
-
+        x = x * w
+        # x = x.view(x.size()[0], -1)
+        x = x.transpose(1,2)
+        s = x.size()
+        x = x.view(s[0] * s[1],-1)
+        x = self.fc(x)
         # if self.encoder_type == "SAP":
         #     x = torch.sum(x * w, dim=2)
         # elif self.encoder_type == "ASP":
@@ -111,7 +116,8 @@ class ResNetSE34(nn.Module):
         # x = x.view(x.size()[0], -1)
         # x = self.fc(x)
 
-        return x * w
+        return x.view(s[0],-1) #(bs, time_step, 256) 
+
 
 
 def MainModel(nOut=256, **kwargs):
